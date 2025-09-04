@@ -1,16 +1,28 @@
 const express = require('express')
+const bcrypt = require('bcrypt')
 const { Usermodel} = require('../db')
 
 const userrouter = express.Router()
+
 userrouter.post('/login',async(req,res)=>{
      res.json({
         message:"login endpoint"
     })
 })
 
-userrouter.post('/signup',(req,res)=>{
+userrouter.post('/signup',async(req,res)=>{
+    const {email,password, first_name,last_name} = req.body
+    const hashedPassword = await bcrypt.hash(password,5)
+
+    await Usermodel.create({
+        email:email,
+        password:hashedPassword,
+        first_name:first_name,
+        last_name:last_name
+    })
+
     res.json({
-        message:"signup endpoint"
+        message:"signed Up successfully"
     })
 })
 

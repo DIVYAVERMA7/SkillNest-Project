@@ -5,6 +5,8 @@ const mongoose = require('mongoose')
 
 
 const app = express()
+app.use(express.json())
+
 const mongoUrl = process.env.MONGO_URL
 const port = process.env.PORT
 
