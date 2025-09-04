@@ -1,13 +1,41 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const { Usermodel} = require('../db')
+const JWT_USER_Password = "123ky"
 
 const userrouter = express.Router()
 
 userrouter.post('/login',async(req,res)=>{
-     res.json({
-        message:"login endpoint"
+    const {email, password}=req.body
+
+    const user = await Usermodel.findOne({
+        email:email
     })
+
+    
+    if(!user){
+        res.status(403).json({
+            message:"User does not exist in our db"
+        })
+        return
+    }
+
+    const passwordMatch = await bcrypt.compare(password,user.password)
+
+
+    if(passwordMatch){
+            const token = jwt.sign({
+                id:user._id.toString()
+            },JWT_USER_Password)
+            res.json({
+                token:token
+            })
+        }else{
+            res.status(403).json({
+                message:'Incorrect credentials'
+            })
+        }
 })
 
 userrouter.post('/signup',async(req,res)=>{
