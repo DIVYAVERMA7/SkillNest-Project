@@ -1,8 +1,11 @@
+require('dotenv').config()
 const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const adminrouter = express.Router()
-const {Adminmodel} = require('../db')
+const {Adminmodel, Coursemodel} = require('../db')
+const { adminMiddleware } = require('../middleware/admin')
+
 const jwt_admin_key = process.env.JWT_ADMIN_PASSWORD
 
 adminrouter.post('/login',async(req,res)=>{
@@ -53,21 +56,52 @@ adminrouter.post('/signup',async(req,res)=>{
     })
 })
 
-adminrouter.post('/course',(req,res)=>{
+adminrouter.post('/course',adminMiddleware, async(req,res)=>{
+    const adminId = req.adminId
+    const {title,description,price,imageurl} = req.body
+
+   const course =  await Coursemodel.create({
+        title:title,
+        description:description,
+        price:price,
+        imageurl:imageurl,
+        creator_id:adminId
+    })
+
     res.json({
-        message:"signup endpoint"
+        message:"Course created",
+        courseId:course.id
     })
 })
 
-adminrouter.put('/course',(req,res)=>{
+adminrouter.put('/course',adminMiddleware, async (req,res)=>{
+    const adminId = req.adminId
+    const {title,description,price,imageurl,courseId} = req.body
+
+   const course =  await Coursemodel.updateOne({
+    _id:courseId,
+    creator_id:adminId},{
+        title:title,
+        description:description,
+        price:price,
+        imageurl:imageurl,
+    })
+
     res.json({
-        message:"signup endpoint"
+        message:"Course updated",
+        courseId:course.id
     })
 })
 
-adminrouter.get('/course/bulk',(req,res)=>{
+adminrouter.get('/course/bulk',adminMiddleware, async(req,res)=>{
+   const adminId = req.adminId
+
+   const courses =  await Coursemodel.find({
+    creator_id:adminId})
+
     res.json({
-        message:"signup endpoint"
+        message:"Courses fetched",
+        courses
     })
 })
 
