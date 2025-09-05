@@ -2,10 +2,10 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { Usermodel} = require('../db')
-const JWT_USER_Password = "123ky"
 
 const userrouter = express.Router()
 
+const jwt_key = process.env.JWT_USER_Password
 userrouter.post('/login',async(req,res)=>{
     const {email, password}=req.body
 
@@ -27,7 +27,7 @@ userrouter.post('/login',async(req,res)=>{
     if(passwordMatch){
             const token = jwt.sign({
                 id:user._id.toString()
-            },JWT_USER_Password)
+            },jwt_key)
             res.json({
                 token:token
             })

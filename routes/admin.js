@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const adminrouter = express.Router()
 const {Adminmodel} = require('../db')
-const JWT_ADMIN_PASSWORD = "256ad"
+const jwt_admin_key = process.env.JWT_ADMIN_PASSWORD
 
 adminrouter.post('/login',async(req,res)=>{
     const {email, password}=req.body
@@ -26,7 +26,7 @@ adminrouter.post('/login',async(req,res)=>{
     if(passwordMatch){
             const token = jwt.sign({
                 id:admin._id.toString()
-            },JWT_ADMIN_PASSWORD)
+            },jwt_admin_key )
             res.json({
                 token:token
             })
